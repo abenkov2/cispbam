@@ -25,11 +25,51 @@ public:
     void evaluateSpringForces(std::vector<TV >& f)
     {
         // TODO: evaluate spring force
+        f.clear();
+        f.resize(x.size(), TV::Zero());
+        for (unsigned long int i = 0; i < segments.size(); i++) {
+            if (rest_length[i] != 0) {
+                TV x_kj = x[segments[i][0]] - x[segments[i][1]];
+                std::cout << "got here LALALALALALALALALALALA";
+                TV x_jk = x[segments[i][1]] - x[segments[i][0]];
+                TV d1 = x_kj.normalized();
+                TV d2 = x_jk.normalized();
+                f[segments[i][0]] += -youngs_modulus * (x_kj).norm() / rest_length[i] * d1;
+                f[segments[i][1]] += -youngs_modulus * (x_jk).norm() / rest_length[i] * d2;
+
+            }
+        }
+
     }
 
     void evaluateDampingForces(std::vector<TV >& f)
     {
         // TODO: evaluate damping force
+        f.clear();
+        f.resize(x.size(), TV::Zero());
+        
+
+        for (unsigned long int i = 0; i < segments.size(); i++) {
+            if (rest_length[i] != 0) {
+            
+                TV x_kj = x[segments[i][0]] - x[segments[i][1]];
+                TV x_jk = x[segments[i][1]] - x[segments[i][0]];
+
+                x_kj.normalize();
+                x_jk.normalize();
+                
+                //TV d1 = x_kj.normalized();
+                //TV d2 = x_jk.normalized();
+
+                TV v_rel_kj = (v[segments[i][0]] - v[segments[i][1]]);
+                TV v_rel_jk = (v[segments[i][1]] - v[segments[i][0]]);
+
+                f[segments[i][0]] += -damping_coeff * (v_rel_kj.dot(x_kj)) * x_kj;
+                f[segments[i][1]] += -damping_coeff * (v_rel_jk.dot(x_jk)) * x_jk;
+
+            }
+        }
+
     }
 
     void dumpPoly(std::string filename)

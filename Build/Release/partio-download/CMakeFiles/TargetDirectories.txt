@@ -1,0 +1,3 @@
+/home/yddraiggochfawr/Desktop/cis563/cispbam/Build/Release/partio-download/CMakeFiles/rebuild_cache.dir
+/home/yddraiggochfawr/Desktop/cis563/cispbam/Build/Release/partio-download/CMakeFiles/edit_cache.dir
+/home/yddraiggochfawr/Desktop/cis563/cispbam/Build/Release/partio-download/CMakeFiles/partio-download.dir
