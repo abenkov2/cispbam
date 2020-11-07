@@ -30,12 +30,12 @@ public:
         for (unsigned long int i = 0; i < segments.size(); i++) {
             if (rest_length[i] != 0) {
                 TV x_kj = x[segments[i][0]] - x[segments[i][1]];
-                std::cout << "got here LALALALALALALALALALALA";
+                //std::cout << "got here LALALALALALALALALALALA";
                 TV x_jk = x[segments[i][1]] - x[segments[i][0]];
                 TV d1 = x_kj.normalized();
                 TV d2 = x_jk.normalized();
-                f[segments[i][0]] += -youngs_modulus * (x_kj).norm() / rest_length[i] * d1;
-                f[segments[i][1]] += -youngs_modulus * (x_jk).norm() / rest_length[i] * d2;
+                f[segments[i][0]] += -youngs_modulus * (((x_kj).norm() / rest_length[i]) - 1.0f) * d1;
+                f[segments[i][1]] += -youngs_modulus * (((x_jk).norm() / rest_length[i]) - 1.0f) * d2;
 
             }
         }

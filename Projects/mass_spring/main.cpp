@@ -33,9 +33,9 @@ int main(int argc, char* argv[])
     SimulationDriver<T,dim> driver;
 
     // set up mass spring system
-    T youngs_modulus = 5.3;
-    T damping_coeff = 2.5; 
-    T dt = 0;
+    T youngs_modulus = 10;
+    T damping_coeff = 2; 
+    T dt = 0.0001;
 
     // node data
     std::vector<T> m;
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         std::cout << "adding points 1" << std::endl;
         for (int i = 0; i < 64; i++) {
             for (int j = 0; j < 64; j++) {
-                x.push_back(TV(float(j), 0.0f, float(63-i)));
+                x.push_back(TV(float(j) / 64.0f, 5.0f, float(63-i) / 64.0f));
             }
         }
         
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         node_is_fixed.push_back(true);
 
         for (unsigned long int i = 0; i < x.size(); i++) {
-            m.push_back(18.0f);
+            m.push_back(1.0f / x.size());
             v.push_back(TV(0.0f, 0.0f, 0.f));
         } 
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
         std::cout << "got here now 4" << std::endl;
 
-
+/*
         for (int i = 0; i < 64; i++) {
             for (int k = 0; k < 60; k++) {
                 segments.push_back(Eigen::Matrix<int,2,1>(64*i + k, 64*i + k + 2));
@@ -128,16 +128,19 @@ int main(int argc, char* argv[])
         }
 
         std::cout << "got here now 5" << std::endl;
-
+*/
 
 
  
 
         for (unsigned long int i = 0; i < segments.size(); i++) {
             //std::cout << "started loop " << std::endl;
-            Eigen::Matrix<int, 2, 1> restd = segments[i];
+            int p1 = segments[i][0];
+            int p2 = segments[i][1];
+            TV x1 = x[p1];
+            TV x2 = x[p2];
             //std::cout << "ya boi made it" << std::endl;
-            T restdn = restd.norm();
+            T restdn = (x1 - x2).norm();
             //std::cout << "restdn: " << restdn << std::endl;
             rest_length.push_back(restdn);
         }
@@ -161,8 +164,7 @@ int main(int argc, char* argv[])
             // TODO
             for (unsigned long int i = 0; i < x.size(); i++) {
                 if (node_is_fixed[i]) {
-                    driver.ms.v[i] += TV(cosf(t), 0.0f, 0.0f);
-                    driver.ms.x[i] += v[i] * dt;
+                    driver.ms.v[i] = TV(0.0f, 0.0f, 0.0f);
                 }
             }
         };

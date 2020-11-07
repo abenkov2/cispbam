@@ -64,8 +64,8 @@ public:
         // TODO: update position and velocity according to Newton's law.
         for (unsigned long int i = 0; i < (ms.x).size(); i++) {
             if (!ms.node_is_fixed[i]) {
-                std::cout << "f_spring[i]: " << f_spring[i];
-                ms.v[i] += dt * (gravity + f_spring[i] + f_damping[i]) / ms.m[i];
+                //std::cout << "f_spring[i]: " << f_spring[i];
+                ms.v[i] += dt * ((gravity * ms.m[i]) + f_spring[i] + f_damping[i]) / ms.m[i];
                 ms.x[i] += dt * ms.v[i];
             }
         }
