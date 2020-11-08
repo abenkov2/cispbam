@@ -33,9 +33,9 @@ int main(int argc, char* argv[])
     SimulationDriver<T,dim> driver;
 
     // set up mass spring system
-    T youngs_modulus = 10;
-    T damping_coeff = 2; 
-    T dt = 0.0001;
+    T youngs_modulus = 10.0f;
+    T damping_coeff = 2.0f; 
+    T dt = 0.00001f;
 
     // node data
     std::vector<T> m;
@@ -68,17 +68,17 @@ int main(int argc, char* argv[])
         std::cout << "adding points 1" << std::endl;
         for (int i = 0; i < 64; i++) {
             for (int j = 0; j < 64; j++) {
-                x.push_back(TV(float(j) / 64.0f, 5.0f, float(63-i) / 64.0f));
+                x.push_back(TV(float(j) / 63.0f, 5.0f, float(63-i) / 63.0f));
             }
         }
         
         std::cout << "got here now" << std::endl;
 
-        node_is_fixed.push_back(true);
         for (int i = 1; i < 4095; i++) {
             node_is_fixed.push_back(false);
         }
-        node_is_fixed.push_back(true);
+        node_is_fixed[0] = true;
+        node_is_fixed[63] = true;
 
         for (unsigned long int i = 0; i < x.size(); i++) {
             m.push_back(1.0f / x.size());
@@ -105,30 +105,28 @@ int main(int argc, char* argv[])
 
         std::cout << "got here now 4" << std::endl;
 
-/*
+
         for (int i = 0; i < 64; i++) {
-            for (int k = 0; k < 60; k++) {
+            for (int k = 0; k < 62; k++) {
                 segments.push_back(Eigen::Matrix<int,2,1>(64*i + k, 64*i + k + 2));
-                segments.push_back(Eigen::Matrix<int,2,1>(64*i + k + 1, 64*i + k + 3));
             }
         }
 
         for (int i = 0; i < 64; i++) {
-            for (int k = 0; k < 60; k++) {
+            for (int k = 0; k < 62; k++) {
                 segments.push_back(Eigen::Matrix<int,2,1>(64*k + i, 64*(k + 2) + i));
-                segments.push_back(Eigen::Matrix<int,2,1>(64*(k + 1) + i, 64*(k + 3) + i));
             }
         }
 
         for (int i = 0; i < 63; i++) {
             for (int k = 0; k < 63; k++) {
                 segments.push_back(Eigen::Matrix<int,2,1>(64*i + k, 64*i + k + 65));
-                segments.push_back(Eigen::Matrix<int,2,1>(64*i + k + 1, 64*i + k + 63));
+                segments.push_back(Eigen::Matrix<int,2,1>(64*i + k + 1, 64*i + k + 64));
             }
         }
 
         std::cout << "got here now 5" << std::endl;
-*/
+
 
 
  
@@ -155,18 +153,41 @@ int main(int argc, char* argv[])
 
         std::cout << "points added to obj" << std::endl;
 
-        for (unsigned long int i = 1; i <= x.size() - 65; i++) {
-            myfile << "f"  << " " << i << " " << i+64 << " " << i+65 << " " << i+1 << "\n";
+        for (int i = 0; i < 63; i++) {
+            for (int j = 1; j < 64; j++) {
+                myfile << "f"  << " " << (64*i)+j << " " << (64*i)+j+64 << " " << (64*i)+j+65 << " " << (64*i)+j+1 << "\n";
+            }
+            
         }
         myfile.close();
 
         driver.helper = [&](T t, T dt) {
             // TODO
-            for (unsigned long int i = 0; i < x.size(); i++) {
-                if (node_is_fixed[i]) {
-                    driver.ms.v[i] = TV(0.0f, 0.0f, 0.0f);
-                }
+            if(t < 1) {
+                driver.ms.x[0][0] += dt;
+                driver.ms.v[0][0] = 1;
+                driver.ms.x[63][0] += dt;
+                driver.ms.v[63][0] = 1;
             }
+            else if(t < 2) {
+                driver.ms.x[0][0] -= dt;
+                driver.ms.v[0][0] = -1;
+                driver.ms.x[63][0] -= dt;
+                driver.ms.v[63][0] = -1;
+            }
+            else if(t < 3) {
+                driver.ms.x[0][0] += dt;
+                driver.ms.v[0][0] = 1;
+                driver.ms.x[63][0] -= dt;
+                driver.ms.v[63][0] = -1;
+            }
+            else if(t < 4) {
+                driver.ms.x[0][0] -= dt;
+                driver.ms.v[0][0] = -1;
+                driver.ms.x[63][0] += dt;
+                driver.ms.v[63][0] = 1;
+            }
+
         };
         driver.test="cloth";
     }
